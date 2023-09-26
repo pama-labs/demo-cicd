@@ -8,7 +8,7 @@ Person *retrievePersonFromDB(int id) {
     if (id < MIN_ID) {
         return NULL;
     }
-    p = (Person *)malloc(sizeof(Person));
+    p = static_cast<Person *>(malloc(sizeof(Person)));
     if (p == 0) exit(1);
     /* initialize p with the data from the database */
     return p;
