@@ -1,0 +1,31 @@
+name: demo
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+jobs:
+  italian:
+    name: Run Parasoft Static Analysis
+    runs-on: self-hosted
+    permissions:
+      security-events: write
+    steps:
+      - name: 1) Gotta checkout the codes
+        uses: actions/checkout@v3
+      - name: 2) Build the codes
+        run: cpptesttrace make clean all
+      - name: 3) Run Parasoft static analysis
+        run: cpptestcli -config "builtin://Effective C++" -report report -property report.format=sarif -input cpptestscan.bdf -compiler gcc_11-64
+      - name: 4) Upload results (SARIF)
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: report/report.sarif
+      - name: 5) Archive reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: CpptestReports
+          path: report/*.*
